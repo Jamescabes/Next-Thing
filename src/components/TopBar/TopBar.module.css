@@ -1,0 +1,46 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md) 0;
+    margin-bottom: var(--space-lg);
+}
+
+.controls {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+}
+
+.settingsButton {
+    padding: 8px;
+    border-radius: 50%;
+    background: var(--color-bg-subtle);
+    color: var(--color-text-primary);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settingsButton:hover {
+    background: var(--color-border);
+}
+
+.dateDisplay {
+    text-align: right;
+}
+
+.day {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.date {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-text-primary);
+}

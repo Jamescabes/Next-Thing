@@ -1,0 +1,89 @@
+.cell {
+    position: relative;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    height: 140px;
+    /* Fixed height to prevent layout jumping */
+    background: var(--color-bg);
+    overflow: hidden;
+    transition: background 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.cell:hover {
+    background: var(--color-bg-subtle);
+}
+
+.dayNumber {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    /* Top side/corner */
+    font-size: var(--font-size-xl);
+    font-weight: 800;
+    color: var(--color-text-primary);
+    opacity: 0.1;
+    /* "Behind" feel - subtle and large? Or just separate layer. */
+    z-index: 0;
+    pointer-events: none;
+}
+
+.eventsContainer {
+    margin-top: 30px;
+    padding: 4px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 1;
+    overflow: hidden;
+    /* Prevent content from pushing the cell boundaries */
+}
+
+.eventList {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.eventBar {
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 600;
+    color: #444;
+    /* Contrast text? Or adaptive? */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    opacity: 0.9;
+    transition: opacity 0.2s;
+}
+
+.eventBar:hover {
+    opacity: 1;
+    transform: scale(1.02);
+}
+
+/* Ensure text is readable on pastel colors */
+.eventTitle {
+    pointer-events: none;
+}
+
+.scrollIndicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.1), transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    z-index: 10;
+}
