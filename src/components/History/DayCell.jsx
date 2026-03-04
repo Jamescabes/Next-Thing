@@ -13,15 +13,6 @@ const DayCell = ({ day, events, onEventClick }) => {
     const totalPages = Math.ceil(events.length / EVENTS_PER_PAGE);
     const hasMore = totalPages > 1;
 
-    // Get current slice of events
-    // If we are at the end, should we loop? The user said "go up till disappear... letting user see next".
-    // Let's loop back to start if at end, or just stop? "next events" implies there are more.
-    // If we run out, maybe cycle? Let's implement cycle for continuous feel.
-    const startIndex = (page * EVENTS_PER_PAGE) % events.length;
-    // Special handling if we want true "chunks". 
-    // Actually, simple paging is safer.
-
-    // Let's do simple paging.
     const visibleEvents = events.slice(page * EVENTS_PER_PAGE, (page + 1) * EVENTS_PER_PAGE);
 
     const handleNextPage = (e) => {

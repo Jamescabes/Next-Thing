@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar as CalendarIcon, List } from 'lucide-react';
+import { X, Calendar as CalendarIcon, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../db/db';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, getDay, addMonths, subMonths } from 'date-fns';
 import BalloonCard from '../BalloonCard/BalloonCard';
 import DayCell from './DayCell';
 import styles from './History.module.css';
@@ -86,14 +86,14 @@ const History = ({ isOpen, onClose, onEditTask }) => {
                                         <BalloonCard
                                             key={task.id}
                                             title={task.title}
-                                            time={task.date} // Showing date in history
+                                            time={task.time}
+                                            date={task.date}
                                             description={task.description}
                                             color={task.color}
                                             onClick={() => {
                                                 onEditTask(task);
                                                 onClose();
                                             }}
-                                        // History items generally not 'completable' here, or already done
                                         />
                                     ))}
                                     <button onClick={handleLoadMore} className={styles.loadMore}>
@@ -102,10 +102,25 @@ const History = ({ isOpen, onClose, onEditTask }) => {
                                 </div>
                             ) : (
                                 <div className={styles.calendarView}>
-                                    <div className={styles.monthLabel}>
-                                        {format(currentMonth, 'MMMM yyyy')}
+                                    <div className={styles.monthNav}>
+                                        <button onClick={() => setCurrentMonth(prev => subMonths(prev, 1))} className={styles.navButton}>
+                                            <ChevronLeft size={20} />
+                                        </button>
+                                        <div className={styles.monthLabel}>
+                                            {format(currentMonth, 'MMMM yyyy')}
+                                        </div>
+                                        <button onClick={() => setCurrentMonth(prev => addMonths(prev, 1))} className={styles.navButton}>
+                                            <ChevronRight size={20} />
+                                        </button>
                                     </div>
                                     <div className={styles.grid}>
+                                        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
+                                            <div key={d} className={styles.weekdayHeader}>{d}</div>
+                                        ))}
+                                        {/* Empty cells for day-of-week offset (Monday = 0) */}
+                                        {Array.from({ length: (getDay(monthStart) + 6) % 7 }, (_, i) => (
+                                            <div key={`empty-${i}`} className={styles.emptyCell} />
+                                        ))}
                                         {daysInMonth.map(day => {
                                             const dayTasks = allTasks.filter(t => isSameDay(parseISO(t.date), day));
                                             return (

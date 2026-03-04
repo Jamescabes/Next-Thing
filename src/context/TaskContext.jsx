@@ -54,7 +54,7 @@ export const TaskProvider = ({ children }) => {
     const taskActions = {
         deleteTask: async (id) => await db.tasks.delete(id),
         toggleComplete: async (task) => {
-            await db.tasks.update(task.id, { isCompleted: !task.isCompleted });
+            await db.tasks.update(task.id, { isCompleted: task.isCompleted ? 0 : 1 });
         }
     };
 

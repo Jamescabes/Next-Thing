@@ -8,6 +8,7 @@ import styles from './EventCreationModal.module.css';
 const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [location, setLocation] = useState('');
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
     const [color, setColor] = useState('');
@@ -17,6 +18,7 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
         if (initialData) {
             setTitle(initialData.title || '');
             setDescription(initialData.description || '');
+            setLocation(initialData.location || '');
             setDate(initialData.date || new Date().toISOString().split('T')[0]);
             setTime(initialData.time || '12:00');
             setColor(initialData.color || '');
@@ -24,6 +26,7 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
             // Reset for new event
             setTitle('');
             setDescription('');
+            setLocation('');
             setDate(new Date().toISOString().split('T')[0]);
             setTime('12:00');
             setColor('');
@@ -47,13 +50,14 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
         if (!title) return;
 
         onSave({
-            id: initialData ? initialData.id : Date.now(), // Keep ID if editing
+            id: initialData ? initialData.id : Date.now(),
             title,
             description,
+            location,
             date,
             time,
             color,
-            isCompleted: initialData ? initialData.isCompleted : false
+            isCompleted: initialData ? initialData.isCompleted : 0
         });
 
         onClose();
@@ -113,7 +117,7 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
                             <div className={styles.metaInputs}>
                                 <div className={styles.inputRow}>
                                     <MapPin size={20} className={styles.icon} />
-                                    <input type="text" placeholder="Location" className={styles.subInput} />
+                                    <input type="text" placeholder="Location" className={styles.subInput} value={location} onChange={(e) => setLocation(e.target.value)} />
                                 </div>
                             </div>
 
@@ -127,14 +131,6 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
                                 />
                             </div>
 
-                            <div className={styles.inputGroup}>
-                                <label className={styles.label}>Description</label>
-                                <textarea
-                                    className={styles.textArea}
-                                    placeholder="(Optional details)"
-                                    rows={2}
-                                />
-                            </div>
                         </div>
                     </motion.div>
                 </motion.div>

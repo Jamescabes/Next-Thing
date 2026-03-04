@@ -88,11 +88,46 @@
     gap: var(--space-md);
 }
 
+.monthNav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+}
+
+.navButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    color: var(--color-text-primary);
+    transition: background 0.2s;
+}
+
+.navButton:hover {
+    background: var(--color-bg-subtle);
+}
+
 .monthLabel {
     font-size: var(--font-size-lg);
     font-weight: 600;
     text-align: center;
-    margin-bottom: var(--space-md);
+}
+
+.weekdayHeader {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    padding: var(--space-sm) 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.emptyCell {
+    min-height: 0;
 }
 
 .grid {
