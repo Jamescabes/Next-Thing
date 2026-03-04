@@ -101,3 +101,30 @@
 .menuItem:hover {
     opacity: 0.7;
 }
+
+.menuItem:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.avatarImg {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.syncTime {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    padding-left: 36px;
+}

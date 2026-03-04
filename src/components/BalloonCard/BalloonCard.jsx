@@ -3,6 +3,17 @@ import { motion } from 'framer-motion';
 import { Clock, Check } from 'lucide-react';
 import styles from './BalloonCard.module.css';
 
+const GoogleBadge = () => (
+    <span className={styles.googleBadge} title="Imported from Google Calendar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="18" height="18" rx="2" fill="#4285F4"/>
+            <rect x="3" y="3" width="9" height="9" fill="#EA4335"/>
+            <rect x="12" y="12" width="9" height="9" fill="#34A853"/>
+            <rect x="3" y="12" width="9" height="9" fill="#FBBC05"/>
+        </svg>
+    </span>
+);
+
 const BalloonCard = ({
     title,
     time,
@@ -10,6 +21,7 @@ const BalloonCard = ({
     description,
     isNext = false,
     color,
+    source,
     onClick,
     onComplete
 }) => {
@@ -41,6 +53,7 @@ const BalloonCard = ({
 
             <div className={styles.header}>
                 <div className={styles.time}>
+                    {source === 'google' && <GoogleBadge />}
                     <Clock size={16} />
                     <span>{time}</span>
                     {/* Simple date check: If valid date string, format it. */}

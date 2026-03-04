@@ -94,3 +94,10 @@
 .checkbox:active {
     transform: scale(0.95);
 }
+
+.googleBadge {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 2px;
+    opacity: 0.7;
+}

@@ -182,6 +182,7 @@ const Home = () => {
                                         date={task.date}
                                         description={task.description}
                                         color={task.color}
+                                        source={task.source}
                                         onClick={() => handleEditTask(task)}
                                         onComplete={() => handleCompleteTask(task)}
                                     />
