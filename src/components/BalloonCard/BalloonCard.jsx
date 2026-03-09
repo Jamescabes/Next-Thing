@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Check } from 'lucide-react';
+import { Clock, Check, Trash2 } from 'lucide-react';
 import styles from './BalloonCard.module.css';
 
 const GoogleBadge = () => (
@@ -23,11 +23,17 @@ const BalloonCard = ({
     color,
     source,
     onClick,
-    onComplete
+    onComplete,
+    onDelete
 }) => {
     const handleComplete = (e) => {
         e.stopPropagation();
         onComplete && onComplete();
+    };
+
+    const handleDelete = (e) => {
+        e.stopPropagation();
+        onDelete && onDelete();
     };
 
     return (
@@ -42,10 +48,19 @@ const BalloonCard = ({
             layout
         >
             <div className={styles.actions}>
+                {onDelete && (
+                    <button
+                        className={styles.deleteBtn}
+                        onClick={handleDelete}
+                        aria-label="Delete event"
+                    >
+                        <Trash2 size={14} strokeWidth={2.5} />
+                    </button>
+                )}
                 <button
                     className={styles.checkbox}
                     onClick={handleComplete}
-                    aria-label="Mark Complete"
+                    aria-label="Mark complete"
                 >
                     <Check size={16} strokeWidth={3} />
                 </button>
@@ -56,8 +71,7 @@ const BalloonCard = ({
                     {source === 'google' && <GoogleBadge />}
                     <Clock size={16} />
                     <span>{time}</span>
-                    {/* Simple date check: If valid date string, format it. */}
-                    {date && <span className={styles.dateSeparator}>•</span>}
+                    {date && <span className={styles.dateSeparator}>&bull;</span>}
                     {date && <span>{new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>}
                 </div>
             </div>

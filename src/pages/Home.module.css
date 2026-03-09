@@ -1,0 +1,142 @@
+.page {
+    position: relative;
+    min-height: 80vh;
+}
+
+.main {
+    padding-bottom: 100px;
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+}
+
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.nowMarker {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin: var(--space-xl) 0;
+    opacity: 0.5;
+}
+
+.nowLine {
+    flex: 1;
+    height: 1px;
+    background: var(--color-accent);
+}
+
+.nowLabel {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+.loadMoreButton {
+    margin: var(--space-xl) auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-tertiary);
+}
+
+.loadMoreLabel {
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+/* Confirm Delete Dialog */
+.dialogBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+}
+
+.dialogBox {
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    max-width: 340px;
+    width: 100%;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.dialogTitle {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+}
+
+.dialogMessage {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-xl);
+    line-height: var(--line-height-normal);
+}
+
+.dialogActions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: flex-end;
+}
+
+.dialogCancel {
+    padding: var(--space-sm) var(--space-lg);
+    font-size: var(--font-size-md);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-subtle);
+}
+
+.dialogConfirm {
+    padding: var(--space-sm) var(--space-lg);
+    font-size: var(--font-size-md);
+    border-radius: var(--radius-sm);
+    background: #ef4444;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+    left: var(--space-md);
+    right: var(--space-md);
+    background: var(--color-text-primary);
+    color: var(--color-bg);
+    border-radius: var(--radius-md);
+    padding: var(--space-md) var(--space-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 400;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.toastMessage {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.toastUndo {
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    color: #60a5fa;
+    background: none;
+    margin-left: var(--space-md);
+}

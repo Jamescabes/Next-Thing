@@ -9,7 +9,6 @@
     position: relative;
     overflow: hidden;
     border: 2px solid var(--color-balloon-border);
-    /* Thicker border */
     width: 100%;
 }
 
@@ -62,12 +61,15 @@
     font-size: var(--font-size-2xl);
 }
 
-/* Checkbox Interaction */
+/* Action buttons */
 .actions {
     position: absolute;
     top: var(--space-lg);
     right: var(--space-lg);
     z-index: 10;
+    display: flex;
+    gap: var(--space-xs);
+    align-items: center;
 }
 
 .checkbox {
@@ -85,13 +87,39 @@
 
 .checkbox:hover {
     border-color: #4caf50;
-    /* Green */
     color: #4caf50;
     transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
 }
 
 .checkbox:active {
+    transform: scale(0.95);
+}
+
+.deleteBtn {
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--color-text-tertiary);
+    transition: all 0.2s;
+    opacity: 0;
+}
+
+.card:hover .deleteBtn {
+    opacity: 1;
+}
+
+.deleteBtn:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    transform: scale(1.1);
+}
+
+.deleteBtn:active {
     transform: scale(0.95);
 }
 

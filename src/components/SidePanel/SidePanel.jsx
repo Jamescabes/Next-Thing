@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Moon, Sun, LogOut, LogIn, RefreshCw } from 'lucide-react';
 import { useGoogleAuth } from '../../context/GoogleAuthContext';
+import useFocusTrap from '../../hooks/useFocusTrap';
 import styles from './SidePanel.module.css';
 
 const SidePanel = ({ isOpen, onClose, isDarkMode, toggleTheme }) => {
@@ -16,11 +17,17 @@ const SidePanel = ({ isOpen, onClose, isDarkMode, toggleTheme }) => {
         syncNow,
     } = useGoogleAuth();
 
+    const focusTrapRef = useFocusTrap(isOpen);
+
     const getSyncLabel = () => {
         if (syncStatus === 'syncing') return 'Syncing...';
         if (syncStatus === 'success' && syncResult) return `Synced (${syncResult.added} new, ${syncResult.updated} updated)`;
         if (syncStatus === 'error') return 'Sync failed — retry?';
         return 'Sync Now';
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Escape') onClose();
     };
 
     return (
@@ -35,11 +42,16 @@ const SidePanel = ({ isOpen, onClose, isDarkMode, toggleTheme }) => {
                         onClick={onClose}
                     />
                     <motion.div
+                        ref={focusTrapRef}
                         className={styles.panel}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Settings panel"
                         initial={{ x: '-100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '-100%' }}
                         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                        onKeyDown={handleKeyDown}
                     >
                         <div className={styles.header}>
                             <div className={styles.userInfo}>
@@ -53,7 +65,7 @@ const SidePanel = ({ isOpen, onClose, isDarkMode, toggleTheme }) => {
                                                 referrerPolicy="no-referrer"
                                             />
                                         ) : (
-                                            <div className={styles.avatar}>
+                                            <div className={styles.avatar} aria-hidden="true">
                                                 <User size={24} />
                                             </div>
                                         )}
@@ -64,7 +76,7 @@ const SidePanel = ({ isOpen, onClose, isDarkMode, toggleTheme }) => {
                                     </>
                                 ) : (
                                     <>
-                                        <div className={styles.avatar}>
+                                        <div className={styles.avatar} aria-hidden="true">
                                             <User size={24} />
                                         </div>
                                         <div className={styles.userDetails}>
@@ -74,24 +86,26 @@ const SidePanel = ({ isOpen, onClose, isDarkMode, toggleTheme }) => {
                                     </>
                                 )}
                             </div>
-                            <button onClick={onClose} className={styles.closeButton}>
+                            <button onClick={onClose} className={styles.closeButton} aria-label="Close settings">
                                 <X size={24} />
                             </button>
                         </div>
 
                         <div className={styles.content}>
-                            <div className={styles.section}>
-                                <h3>Google Calendar</h3>
+                            <section className={styles.section} aria-labelledby="google-section">
+                                <h3 id="google-section">Google Calendar</h3>
                                 {user ? (
                                     <>
                                         <button
                                             className={styles.menuItem}
                                             onClick={() => syncNow()}
                                             disabled={syncStatus === 'syncing'}
+                                            aria-label={getSyncLabel()}
                                         >
                                             <RefreshCw
                                                 size={20}
                                                 className={syncStatus === 'syncing' ? styles.spinning : ''}
+                                                aria-hidden="true"
                                             />
                                             <span>{getSyncLabel()}</span>
                                         </button>
@@ -107,28 +121,32 @@ const SidePanel = ({ isOpen, onClose, isDarkMode, toggleTheme }) => {
                                         onClick={signIn}
                                         disabled={isLoading}
                                     >
-                                        <LogIn size={20} />
+                                        <LogIn size={20} aria-hidden="true" />
                                         <span>{isLoading ? 'Signing in...' : 'Sign in with Google'}</span>
                                     </button>
                                 )}
-                            </div>
+                            </section>
 
-                            <div className={styles.section}>
-                                <h3>Appearance</h3>
-                                <button className={styles.menuItem} onClick={toggleTheme}>
-                                    {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+                            <section className={styles.section} aria-labelledby="appearance-section">
+                                <h3 id="appearance-section">Appearance</h3>
+                                <button
+                                    className={styles.menuItem}
+                                    onClick={toggleTheme}
+                                    aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                                >
+                                    {isDarkMode ? <Sun size={20} aria-hidden="true" /> : <Moon size={20} aria-hidden="true" />}
                                     <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
                                 </button>
-                            </div>
+                            </section>
 
                             {user && (
-                                <div className={styles.section}>
-                                    <h3>Account</h3>
+                                <section className={styles.section} aria-labelledby="account-section">
+                                    <h3 id="account-section">Account</h3>
                                     <button className={styles.menuItem} onClick={signOut}>
-                                        <LogOut size={20} />
+                                        <LogOut size={20} aria-hidden="true" />
                                         <span>Sign Out</span>
                                     </button>
-                                </div>
+                                </section>
                             )}
                         </div>
                     </motion.div>

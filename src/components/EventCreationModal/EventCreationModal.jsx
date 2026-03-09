@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin } from 'lucide-react';
+import { X, MapPin, Info } from 'lucide-react';
 import DateTimePicker from '../DateTimePicker/DateTimePicker';
 import ColorPicker from '../ColorPicker/ColorPicker';
+import useFocusTrap from '../../hooks/useFocusTrap';
 import styles from './EventCreationModal.module.css';
 
 const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
@@ -12,6 +13,11 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
     const [color, setColor] = useState('');
+    const [titleError, setTitleError] = useState('');
+
+    const focusTrapRef = useFocusTrap(isOpen);
+
+    const isGoogleEvent = initialData?.source === 'google';
 
     // Hydrate form when initialData changes (Edit Mode)
     useEffect(() => {
@@ -23,7 +29,6 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
             setTime(initialData.time || '12:00');
             setColor(initialData.color || '');
         } else {
-            // Reset for new event
             setTitle('');
             setDescription('');
             setLocation('');
@@ -31,27 +36,20 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
             setTime('12:00');
             setColor('');
         }
+        setTitleError('');
     }, [initialData, isOpen]);
-
-    const handleQuickDate = (daysToAdd) => {
-        const date = new Date();
-        date.setDate(date.getDate() + daysToAdd);
-        // Default to morning for quick add? Or keep current time? 
-        // Let's set a default time like 9:00 AM or just keep it blank/current.
-        // The modal uses 'time' state.
-
-        const dateStr = date.toISOString().split('T')[0];
-        setDate(dateStr);
-        // We do NOT call onSave here anymore.
-    };
 
     const handleSave = (e) => {
         e.preventDefault();
-        if (!title) return;
+        if (!title.trim()) {
+            setTitleError('Title is required');
+            return;
+        }
+        setTitleError('');
 
         onSave({
             id: initialData ? initialData.id : Date.now(),
-            title,
+            title: title.trim(),
             description,
             location,
             date,
@@ -63,6 +61,10 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
         onClose();
     };
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Escape') onClose();
+    };
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -71,63 +73,106 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
+                    onKeyDown={handleKeyDown}
                 >
                     <motion.div
+                        ref={focusTrapRef}
                         className={styles.modal}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="modal-title"
                         initial={{ y: '100%' }}
                         animate={{ y: 0 }}
                         exit={{ y: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                     >
                         <div className={styles.header}>
-                            <button onClick={onClose} className={styles.closeButton}>
+                            <button onClick={onClose} className={styles.closeButton} aria-label="Close modal">
                                 <X size={24} />
                             </button>
-                            <span className={styles.modalTitle}>{initialData ? 'Edit Event' : 'New Event'}</span>
-                            <button onClick={handleSave} className={styles.saveButton} disabled={!title}>
-                                Save
-                            </button>
+                            <span id="modal-title" className={styles.modalTitle}>
+                                {initialData ? 'Edit Event' : 'New Event'}
+                            </span>
+                            {!isGoogleEvent && (
+                                <button
+                                    onClick={handleSave}
+                                    className={styles.saveButton}
+                                    disabled={!title.trim()}
+                                >
+                                    Save
+                                </button>
+                            )}
+                            {isGoogleEvent && <div style={{ width: 40 }} />}
                         </div>
+
+                        {isGoogleEvent && (
+                            <div className={styles.googleBanner} role="status">
+                                <Info size={16} />
+                                <span>Imported from Google Calendar (read-only)</span>
+                            </div>
+                        )}
 
                         <div className={styles.formContainer}>
                             <div className={styles.inputGroup}>
-                                <label className={styles.label}>What's Next?</label>
+                                <label htmlFor="event-title" className={styles.label}>What&apos;s Next?</label>
                                 <input
+                                    id="event-title"
                                     type="text"
-                                    className={styles.titleInput}
+                                    className={`${styles.titleInput} ${titleError ? styles.inputError : ''}`}
                                     value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
+                                    onChange={(e) => { setTitle(e.target.value); setTitleError(''); }}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSave(e)}
                                     autoFocus={!initialData}
+                                    readOnly={isGoogleEvent}
+                                    aria-required="true"
+                                    aria-invalid={!!titleError}
+                                    aria-describedby={titleError ? 'title-error' : undefined}
                                 />
+                                {titleError && (
+                                    <span id="title-error" className={styles.errorMsg} role="alert">
+                                        {titleError}
+                                    </span>
+                                )}
                             </div>
 
                             <DateTimePicker
                                 date={date}
                                 time={time}
-                                onDateChange={setDate}
-                                onTimeChange={setTime}
+                                onDateChange={isGoogleEvent ? () => {} : setDate}
+                                onTimeChange={isGoogleEvent ? () => {} : setTime}
                             />
 
-                            <ColorPicker
-                                selectedColor={color}
-                                onSelectColor={setColor}
-                            />
+                            {!isGoogleEvent && (
+                                <ColorPicker
+                                    selectedColor={color}
+                                    onSelectColor={setColor}
+                                />
+                            )}
 
                             <div className={styles.metaInputs}>
                                 <div className={styles.inputRow}>
                                     <MapPin size={20} className={styles.icon} />
-                                    <input type="text" placeholder="Location" className={styles.subInput} value={location} onChange={(e) => setLocation(e.target.value)} />
+                                    <input
+                                        type="text"
+                                        placeholder="Location"
+                                        className={styles.subInput}
+                                        value={location}
+                                        onChange={(e) => setLocation(e.target.value)}
+                                        readOnly={isGoogleEvent}
+                                        aria-label="Location"
+                                    />
                                 </div>
                             </div>
 
                             <div className={styles.inputGroup}>
-                                <label className={styles.label}>Notes</label>
+                                <label htmlFor="event-notes" className={styles.label}>Notes</label>
                                 <textarea
+                                    id="event-notes"
                                     className={styles.textArea}
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     rows={4}
+                                    readOnly={isGoogleEvent}
                                 />
                             </div>
 

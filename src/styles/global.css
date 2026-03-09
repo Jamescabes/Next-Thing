@@ -14,6 +14,8 @@ body {
     font-size: var(--font-size-md);
     transition: background-color 0.3s ease, color 0.3s ease;
     overflow-x: hidden;
+    /* Safe area insets for notched devices */
+    padding-top: env(safe-area-inset-top, 0px);
 }
 
 button {
@@ -31,6 +33,26 @@ button {
     min-height: 100vh;
     position: relative;
     padding: var(--space-md);
+    padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
     display: flex;
     flex-direction: column;
+}
+
+/* Screen reader only utility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Focus ring for keyboard navigation */
+:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
 }

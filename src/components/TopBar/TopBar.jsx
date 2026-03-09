@@ -1,16 +1,22 @@
 import { Settings, History } from 'lucide-react';
+import SearchBar from '../SearchBar/SearchBar';
 import styles from './TopBar.module.css';
 
-const TopBar = ({ onOpenSettings, onOpenHistory }) => {
+const TopBar = ({
+    onOpenSettings,
+    onOpenHistory,
+    searchQuery = '',
+    onSearchChange,
+    isSearchOpen = false,
+    onSearchToggle
+}) => {
     const now = new Date();
 
-    // Format: "MONDAY"
     const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
-    // Format: "Feb 10"
     const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
     return (
-        <div className={styles.container}>
+        <nav className={styles.container} aria-label="Main navigation">
             <div className={styles.controls}>
                 <button
                     className={styles.settingsButton}
@@ -26,13 +32,21 @@ const TopBar = ({ onOpenSettings, onOpenHistory }) => {
                 >
                     <History size={20} strokeWidth={2} />
                 </button>
+                {onSearchToggle && (
+                    <SearchBar
+                        isOpen={isSearchOpen}
+                        query={searchQuery}
+                        onChange={onSearchChange}
+                        onToggle={onSearchToggle}
+                    />
+                )}
             </div>
 
-            <div className={styles.dateDisplay}>
+            <div className={styles.dateDisplay} aria-label={`${dayName}, ${dateStr}`}>
                 <div className={styles.day}>{dayName}</div>
                 <div className={styles.date}>{dateStr}</div>
             </div>
-        </div>
+        </nav>
     );
 };
 
