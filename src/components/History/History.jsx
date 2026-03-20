@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar as CalendarIcon, List } from 'lucide-react';
+import { X, Calendar as CalendarIcon, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../db/db';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, addMonths, subMonths } from 'date-fns';
 import BalloonCard from '../BalloonCard/BalloonCard';
 import DayCell from './DayCell';
 import styles from './History.module.css';
@@ -11,32 +11,34 @@ import styles from './History.module.css';
 const History = ({ isOpen, onClose, onEditTask }) => {
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
     const [limit, setLimit] = useState(30);
+    const [currentMonth, setCurrentMonth] = useState(new Date());
 
-    // -- List Data (Pagination) --
-    // Fetch completed tasks or past events. User said "all past events", so maybe completed?
-    // Let's assume history means completed or past date. 
-    // For now, let's show ALL tasks, but typically history is completed.
-    // Query: Tasks, ordered by date descending, limited.
+    // -- List Data: completed tasks only, ordered by date descending --
     const historyTasks = useLiveQuery(
         () => db.tasks
             .orderBy('date')
             .reverse()
+            .filter(t => !!t.isCompleted)
             .limit(limit)
             .toArray(),
         [limit]
     );
 
-    // -- Calendar Data --
-    const [currentMonth, setCurrentMonth] = useState(new Date());
+    // -- Calendar Data: all tasks for the current month --
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
     const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-    // Fetch tasks for this month to display in cells
-    // Since Dexie is local, fetching all tasks is usually fast enough for a personal calendar,
-    // but better to query range if possible. For simplicity here: fetch all and filter in JS 
-    // (Optimization: In a real large DB, use a range query on date index).
-    const allTasks = useLiveQuery(() => db.tasks.toArray()) || [];
+    const monthStartStr = format(monthStart, 'yyyy-MM-dd');
+    const monthEndStr = format(monthEnd, 'yyyy-MM-dd');
+
+    const monthTasks = useLiveQuery(
+        () => db.tasks
+            .where('date')
+            .between(monthStartStr, monthEndStr, true, true)
+            .toArray(),
+        [monthStartStr, monthEndStr]
+    ) || [];
 
     const handleLoadMore = () => {
         setLimit(prev => prev + 30);
@@ -82,32 +84,51 @@ const History = ({ isOpen, onClose, onEditTask }) => {
                         <div className={styles.content}>
                             {viewMode === 'list' ? (
                                 <div className={styles.listView}>
+                                    {historyTasks?.length === 0 && (
+                                        <p className={styles.emptyState}>No completed events yet.</p>
+                                    )}
                                     {historyTasks?.map(task => (
                                         <BalloonCard
                                             key={task.id}
                                             title={task.title}
-                                            time={task.date} // Showing date in history
+                                            time={task.time}
+                                            date={task.date}
                                             description={task.description}
                                             color={task.color}
                                             onClick={() => {
                                                 onEditTask(task);
                                                 onClose();
                                             }}
-                                        // History items generally not 'completable' here, or already done
                                         />
                                     ))}
-                                    <button onClick={handleLoadMore} className={styles.loadMore}>
-                                        Load More (Batch 30)
-                                    </button>
+                                    {historyTasks?.length >= limit && (
+                                        <button onClick={handleLoadMore} className={styles.loadMore}>
+                                            Load More (Batch 30)
+                                        </button>
+                                    )}
                                 </div>
                             ) : (
                                 <div className={styles.calendarView}>
-                                    <div className={styles.monthLabel}>
-                                        {format(currentMonth, 'MMMM yyyy')}
+                                    <div className={styles.monthNav}>
+                                        <button
+                                            className={styles.monthNavBtn}
+                                            onClick={() => setCurrentMonth(m => subMonths(m, 1))}
+                                        >
+                                            <ChevronLeft size={20} />
+                                        </button>
+                                        <span className={styles.monthLabel}>
+                                            {format(currentMonth, 'MMMM yyyy')}
+                                        </span>
+                                        <button
+                                            className={styles.monthNavBtn}
+                                            onClick={() => setCurrentMonth(m => addMonths(m, 1))}
+                                        >
+                                            <ChevronRight size={20} />
+                                        </button>
                                     </div>
                                     <div className={styles.grid}>
                                         {daysInMonth.map(day => {
-                                            const dayTasks = allTasks.filter(t => isSameDay(parseISO(t.date), day));
+                                            const dayTasks = monthTasks.filter(t => isSameDay(parseISO(t.date), day));
                                             return (
                                                 <DayCell
                                                     key={day.toString()}

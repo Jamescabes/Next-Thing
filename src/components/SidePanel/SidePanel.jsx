@@ -1,9 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Moon, Sun, LogOut } from 'lucide-react';
-import styles from './SidePanel.module.css'; // We'll create this next
+import { X, User, Moon, Sun, LogOut, Trash2, AlertTriangle } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import styles from './SidePanel.module.css';
 
 const SidePanel = ({ isOpen, onClose, isDarkMode, toggleTheme }) => {
+    const { currentUser, logOut, deleteAccount } = useAuth();
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleLogOut = () => {
+        onClose();
+        logOut();
+    };
+
+    const handleDeleteAccount = async () => {
+        setIsDeleting(true);
+        await deleteAccount();
+        // AuthContext sets currentUser to null, App re-renders to Login
+    };
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -28,8 +44,8 @@ const SidePanel = ({ isOpen, onClose, isDarkMode, toggleTheme }) => {
                                     <User size={24} />
                                 </div>
                                 <div className={styles.userDetails}>
-                                    <span className={styles.userName}>User Name</span>
-                                    <span className={styles.userEmail}>user@example.com</span>
+                                    <span className={styles.userName}>{currentUser?.username || 'User'}</span>
+                                    <span className={styles.userEmail}>{currentUser?.email || ''}</span>
                                 </div>
                             </div>
                             <button onClick={onClose} className={styles.closeButton}>
@@ -48,12 +64,55 @@ const SidePanel = ({ isOpen, onClose, isDarkMode, toggleTheme }) => {
 
                             <div className={styles.section}>
                                 <h3>Account</h3>
-                                <button className={styles.menuItem}>
+                                <button className={styles.menuItem} onClick={handleLogOut}>
                                     <LogOut size={20} />
                                     <span>Log Out</span>
                                 </button>
+                                <button
+                                    className={`${styles.menuItem} ${styles.danger}`}
+                                    onClick={() => setShowDeleteConfirm(true)}
+                                >
+                                    <Trash2 size={20} />
+                                    <span>Delete Account</span>
+                                </button>
                             </div>
                         </div>
+
+                        {/* Delete Account confirmation */}
+                        <AnimatePresence>
+                            {showDeleteConfirm && (
+                                <motion.div
+                                    className={styles.confirmOverlay}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                >
+                                    <div className={styles.confirmBox}>
+                                        <AlertTriangle size={32} className={styles.warningIcon} />
+                                        <h3 className={styles.confirmTitle}>Delete Account?</h3>
+                                        <p className={styles.confirmText}>
+                                            This will permanently delete your account and all your events. This cannot be undone.
+                                        </p>
+                                        <div className={styles.confirmActions}>
+                                            <button
+                                                className={styles.cancelBtn}
+                                                onClick={() => setShowDeleteConfirm(false)}
+                                                disabled={isDeleting}
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                className={styles.deleteBtn}
+                                                onClick={handleDeleteAccount}
+                                                disabled={isDeleting}
+                                            >
+                                                {isDeleting ? 'Deleting...' : 'Delete'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </motion.div>
                 </>
             )}

@@ -8,6 +8,8 @@ import styles from './EventCreationModal.module.css';
 const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [notes, setNotes] = useState('');
+    const [location, setLocation] = useState('');
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
     const [color, setColor] = useState('');
@@ -17,6 +19,8 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
         if (initialData) {
             setTitle(initialData.title || '');
             setDescription(initialData.description || '');
+            setNotes(initialData.notes || '');
+            setLocation(initialData.location || '');
             setDate(initialData.date || new Date().toISOString().split('T')[0]);
             setTime(initialData.time || '12:00');
             setColor(initialData.color || '');
@@ -24,32 +28,24 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
             // Reset for new event
             setTitle('');
             setDescription('');
+            setNotes('');
+            setLocation('');
             setDate(new Date().toISOString().split('T')[0]);
             setTime('12:00');
             setColor('');
         }
     }, [initialData, isOpen]);
 
-    const handleQuickDate = (daysToAdd) => {
-        const date = new Date();
-        date.setDate(date.getDate() + daysToAdd);
-        // Default to morning for quick add? Or keep current time? 
-        // Let's set a default time like 9:00 AM or just keep it blank/current.
-        // The modal uses 'time' state.
-
-        const dateStr = date.toISOString().split('T')[0];
-        setDate(dateStr);
-        // We do NOT call onSave here anymore.
-    };
-
     const handleSave = (e) => {
         e.preventDefault();
         if (!title) return;
 
         onSave({
-            id: initialData ? initialData.id : Date.now(), // Keep ID if editing
+            id: initialData ? initialData.id : Date.now(),
             title,
             description,
+            notes,
+            location,
             date,
             time,
             color,
@@ -113,7 +109,13 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
                             <div className={styles.metaInputs}>
                                 <div className={styles.inputRow}>
                                     <MapPin size={20} className={styles.icon} />
-                                    <input type="text" placeholder="Location" className={styles.subInput} />
+                                    <input
+                                        type="text"
+                                        placeholder="Location"
+                                        className={styles.subInput}
+                                        value={location}
+                                        onChange={(e) => setLocation(e.target.value)}
+                                    />
                                 </div>
                             </div>
 
@@ -132,6 +134,8 @@ const EventCreationModal = ({ isOpen, onClose, onSave, initialData }) => {
                                 <textarea
                                     className={styles.textArea}
                                     placeholder="(Optional details)"
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
                                     rows={2}
                                 />
                             </div>

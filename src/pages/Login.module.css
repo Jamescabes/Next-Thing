@@ -1,0 +1,126 @@
+.page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl) var(--space-lg);
+    gap: var(--space-2xl);
+}
+
+.brand {
+    text-align: center;
+}
+
+.logo {
+    font-size: var(--font-size-2xl);
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--color-text-primary);
+}
+
+.tagline {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    margin-top: var(--space-xs);
+}
+
+.card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.tab {
+    flex: 1;
+    padding: var(--space-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    transition: color 0.2s, background 0.2s;
+}
+
+.tab.activeTab {
+    color: var(--color-text-primary);
+    font-weight: 700;
+    border-bottom: 2px solid var(--color-accent);
+    margin-bottom: -1px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    padding: var(--space-xl);
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.input {
+    width: 100%;
+    padding: var(--space-md);
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-md);
+    font-family: inherit;
+    color: var(--color-text-primary);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input:focus {
+    border-color: var(--color-accent);
+}
+
+.input::placeholder {
+    color: var(--color-text-tertiary);
+}
+
+.error {
+    font-size: var(--font-size-sm);
+    color: #e24a4a;
+    background: rgba(226, 74, 74, 0.08);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+}
+
+.submitButton {
+    width: 100%;
+    padding: var(--space-md);
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    font-family: inherit;
+    transition: opacity 0.2s;
+    margin-top: var(--space-xs);
+}
+
+.submitButton:hover {
+    opacity: 0.85;
+}
+
+.submitButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

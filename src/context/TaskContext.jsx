@@ -1,20 +1,20 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
+import { useAuth } from './AuthContext';
 
 const TaskContext = createContext();
 
 export const useTasks = () => useContext(TaskContext);
 
 export const TaskProvider = ({ children }) => {
-    // Theme state - Default to Light Mode as requested
+    const { currentUser } = useAuth();
+
+    // Theme state
     const [isDarkMode, setIsDarkMode] = useState(false);
 
-    const toggleTheme = () => {
-        setIsDarkMode(prev => !prev);
-    }
+    const toggleTheme = () => setIsDarkMode(prev => !prev);
 
-    // Apply theme class to body
     useEffect(() => {
         if (isDarkMode) {
             document.documentElement.setAttribute('data-theme', 'dark');
@@ -23,26 +23,30 @@ export const TaskProvider = ({ children }) => {
         }
     }, [isDarkMode]);
 
-
-    // -- Database Integration --
-
-    // Live query for active tasks (not completed), sorted by time
-    // We fetch all here for the home page.
+    // Live query: active (non-completed) tasks for the current user only
     const tasks = useLiveQuery(
-        () => db.tasks.where('isCompleted').equals(0).sortBy('time')
+        () => {
+            if (!currentUser) return Promise.resolve([]);
+            return db.tasks
+                .where('userId')
+                .equals(currentUser.id)
+                .filter(t => !t.isCompleted)
+                .toArray();
+        },
+        [currentUser?.id]
     ) || [];
 
     const saveTask = async (task) => {
+        if (!currentUser) return;
         try {
             if (task.id && await db.tasks.get(task.id)) {
-                // Update
-                await db.tasks.update(task.id, task);
+                await db.tasks.update(task.id, { ...task, userId: currentUser.id });
             } else {
-                // Add new (remove id if it's a temp timestamp one, let Dexie auto-increment)
                 const { id, ...newTask } = task;
                 await db.tasks.add({
                     ...newTask,
-                    isCompleted: 0, // Ensure numeric/boolean consistency if needed, Dexie handles bools usually but let's be safe
+                    userId: currentUser.id,
+                    isCompleted: false,
                     createdAt: new Date()
                 });
             }
